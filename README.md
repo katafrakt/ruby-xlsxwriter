@@ -1,28 +1,53 @@
-# Ruby::Xlsxwriter
+# XlsxWriter
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ruby/xlsxwriter`. To experiment with that code, run `bin/console` for an interactive prompt.
+This little library is a fast XLSX files writer, base on quite awesome [libxlsxwriter](https://libxlsxwriter.github.io/) written in C. Unlike existing solutions, such as [RubyXL](https://github.com/weshatheleopard/rubyXL) is does not let you manipulate existing files or read them. A sheer goal of XlsxWriter is to be able to dump data into an Excel file and hopefully forget it.
 
-TODO: Delete this and the text above, and describe your gem
+This is very work-in-progress now and supports only basic things I needed for tests. Feel free to add more or open an issue if you need something more from libxlsxwriter.
 
 ## Installation
+
+As a preparation step, you need to install libxlsxwriter.
+
+* On Mac apparently it's enough to `brew install libxlsxwriter` (not tested)
+* On Linux it's usual `git clone` + `make` + `make install` (unless you're on Arch, then you have packages in AUR available)
+* On Windows you're on your own, but please let me know if you succeed, so I can update this README
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'ruby-xlsxwriter'
+gem 'xlsxwriter', github: 'katafrakt/ruby-xlsxwriter'
 ```
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install ruby-xlsxwriter
-
 ## Usage
 
-TODO: Write usage instructions here
+Basic usage:
+
+```ruby
+XlsxWriter.create('test.xlsx') do |excel|
+  excel.write_row(['The Title'], bold: true, font_size: 25, height: 27)
+  excel.skip_row
+  excel.write_row [nil, 2, 'test', Class.new, 2.67]
+  excel.write_row [nil, 2, 'test', Class.new, 2.67], offset: 5
+end
+```
+
+You also have memory-efficient mode available. To enable it, initialize like this:
+
+```
+XlsxWriter.create('test.xlsx', constant_memory: true) do |excel|
+```
+
+In my local tests with rewriting 550k-rows CSV file into XLSX it went down from 1415MB peak memory usage to just 153MB.
+
+Caveats:
+* You need to write your rows in orded (it's impossible to do otherwise using public API, but you could do it using low-level XlsxWriter::C bindings).
+* It uses something called string-inlining, which work fine in most spreadsheet software, with expected exception of Apple Numbers, which shows empty cells instead. You're gonna need to tell people to use real software instead (which is a good piece of advise anyway).
+
+More details: http://libxlsxwriter.github.io/working_with_memory.html
 
 ## Development
 
