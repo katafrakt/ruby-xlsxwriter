@@ -28,7 +28,14 @@ Basic usage:
 
 ```ruby
 XlsxWriter.create('test.xlsx') do |excel|
-  excel.write_row(['The Title'], bold: true, font_size: 25, height: 27)
+  excel.set_column_styles([
+                            { width: 10 },
+                            { width: 20 },
+                            { width: 12, copy_for_next: 7 },
+                            { width: nil, copy_for_next: 1 }, # default width
+                            { width: 10 }
+                          ])
+  excel.write_row(['The Title'], format: { bold: true, font_size: 25, height: 27 })
   excel.skip_row
   excel.write_row [nil, 2, 'test', Class.new, 2.67]
   excel.write_row [nil, 2, 'test', Class.new, 2.67], offset: 5
@@ -41,7 +48,7 @@ You also have memory-efficient mode available. To enable it, initialize like thi
 XlsxWriter.create('test.xlsx', constant_memory: true) do |excel|
 ```
 
-In my local tests with rewriting 550k-rows CSV file into XLSX it went down from 1415MB peak memory usage to just 153MB.
+In my local tests with rewriting 550k-rows CSV file into XLSX it went down from 1415MB peak memory usage to just 153MB. Processing time also gets cut down in half.
 
 Caveats:
 * You need to write your rows in orded (it's impossible to do otherwise using public API, but you could do it using low-level XlsxWriter::C bindings).

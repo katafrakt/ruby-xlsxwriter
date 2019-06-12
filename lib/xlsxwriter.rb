@@ -27,9 +27,9 @@ module XlsxWriter
       C.workbook_close(workbook)
     end
 
-    def write_row(rowdef, format = {})
-      offset = format.delete(:offset) || 0
-      apply_row_formatting!(format)
+    def write_row(rowdef, options = {})
+      offset = options[:offset] || 0
+      apply_row_formatting!(options.fetch(:format, {}))
 
       rowdef.each_with_index do |item, idx|
         next if item.nil?
@@ -46,6 +46,19 @@ module XlsxWriter
 
     def skip_row
       @current_row += 1
+    end
+
+    def set_column_styles(styles, options = {})
+      offset = options[:offset] || 0
+      styles.each_with_index do |column_style, idx|
+        width = column_style.delete(:width) || C::LXW_DEF_COL_WIDTH
+        start_column = idx + offset
+        copy_for_next = column_style.delete(:copy_for_next) || 0
+        offset += copy_for_next
+        end_column = start_column + copy_for_next
+        format_ptr = column_style.empty? ? nil : format_parser.format(column_style)
+        C.worksheet_set_column(worksheet, start_column, end_column, width, format_ptr)
+      end
     end
 
     private
