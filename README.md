@@ -24,7 +24,7 @@ And then execute:
 
 ## Usage
 
-Basic usage:
+### Basic usage
 
 ```ruby
 XlsxWriter.create('test.xlsx') do |excel|
@@ -42,6 +42,8 @@ XlsxWriter.create('test.xlsx') do |excel|
 end
 ```
 
+### Memory-efficient mode
+
 You also have memory-efficient mode available. To enable it, initialize like this:
 
 ```
@@ -51,7 +53,7 @@ XlsxWriter.create('test.xlsx', constant_memory: true)
 In my local tests with rewriting 550k-rows CSV file into XLSX it went down from 1140MB peak memory usage to just 153MB.
 
 Caveats:
-* You need to write your rows in orded (it's impossible to do otherwise using public API, but you could do it using low-level `XlsxWriter::C` bindings).
+* You need to write your rows in order (it's impossible to do otherwise using public API, but you could do it using low-level `XlsxWriter::C` bindings).
 * It uses something called string-inlining, which work fine in most spreadsheet software, with expected exception of Apple Numbers, which shows empty cells instead. You're gonna need to tell people to use real software instead (which is a good piece of advise anyway).
 
 More details: http://libxlsxwriter.github.io/working_with_memory.html
